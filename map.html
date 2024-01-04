@@ -1,0 +1,269 @@
+<html>
+  <head>
+    <script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
+    <script src="map.js"></script>
+    <style>
+      .mapCanvas {
+        background-color: #000000;
+      }
+
+      .mapHandle {
+        fill: #ffd966;
+        stroke: #fd9500;
+        stroke-width: 2;
+      }
+
+      .mapHandle.active,
+      .mapHandle.selected {
+        fill: #00e3e3;
+        stroke: #ccffff;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="mapContent"></div>
+    <script>
+      var data = [
+        {
+          filename: "topo-arcticsea.json",
+          name: "ArcticSea",
+          label: "Arctic Sea",
+          mrgid: "8747",
+          color: "#4C7298",
+          link: "./results-fish.js?regions=Arctic%20Ocean",
+          adjustCenter: { standard: [-4, 0], rotate: [0, 0] },
+        },
+        {
+          filename: "topo_atlantic_antartic.json",
+          name: "AtlanticAntartic",
+          label: "Atlantic Ocean - Antarctic",
+          mrgid: "8740",
+          color: "#4C7298",
+          link: "./results-fish.js?regions=Atlantic%20Antarctic",
+          adjustCenter: { standard: [0, 0], rotate: [0, 0] },
+        },
+        {
+          filename: "topo_atlantic_eastern_central.json",
+          name: "AtlanticEasternCentral",
+          label: "Atlantic Ocean - Eastern Central",
+          mrgid: "8752",
+          color: "#4C7298",
+          link: "./results-fish.js?regions=Atlantic%20Eastern%20Central",
+          adjustCenter: { standard: [-1.5, -1], rotate: [0, 0] },
+        },
+        {
+          filename: "topo_atlantic_northeast.json",
+          name: "AtlanticNortheast",
+          label: "Atlantic Ocean - Northeast",
+          mrgid: "8753",
+          color: "#4C7298",
+          link: "./results-fish.js?regions=Atlantic%20Northeast",
+          adjustCenter: { standard: [0, 0], rotate: [0, 0] },
+        },
+        {
+          filename: "topo_atlantic_northwest.json",
+          name: "AtlanticNorthwest",
+          label: "Atlantic Ocean - Northwest",
+          mrgid: "8748",
+          color: "#4C7298",
+          link: "./results-fish.js?regions=Atlantic%20Northwest",
+          adjustCenter: { standard: [2, 1], rotate: [0, 0] },
+        },
+        {
+          filename: "topo_atlantic_southeast.json",
+          name: "AtlanticSoutheast",
+          label: "Atlantic Ocean - Southeast",
+          mrgid: "8751",
+          color: "#4C7298",
+          link: "./results-fish.js?regions=Atlantic%20Southeast",
+          adjustCenter: { standard: [0, 0], rotate: [0, 0] },
+        },
+        {
+          filename: "topo_atlantic_southwest.json",
+          name: "AtlanticSouthwest",
+          label: "Atlantic Ocean - Southwest",
+          mrgid: "8750",
+          color: "#4C7298",
+          link: "./results-fish.js?regions=Atlantic%20Southwest",
+          adjustCenter: { standard: [0, 0], rotate: [0, 0] },
+        },
+        {
+          filename: "topo_atlantic_western_central.json",
+          name: "AtlanticWesternCentral",
+          label: "Atlantic Ocean - Western Central",
+          mrgid: "8749",
+          color: "#4C7298",
+          link: "./results-fish.js?regions=Atlantic%20Western%20Central",
+          adjustCenter: { standard: [0, 0], rotate: [0, 0] },
+        },
+        {
+          filename: "topo_indian_antartic_southern_ocean.json",
+          name: "IndianAntarticSouthernOcean",
+          label: "Indian Ocean - Antarctic/Southern",
+          mrgid: "8741",
+          color: "#4C7298",
+          link: "./results-fish.js?regions=Indian%20Ocean%20Antarctic",
+          adjustCenter: { standard: [-3, 0], rotate: [0, 0] },
+        },
+        {
+          filename: "topo_indian_ocean_eastern.json",
+          name: "IndianOceanEastern",
+          label: "Indian Ocean - Eastern",
+          mrgid: "8756",
+          color: "#4C7298",
+          link: "./results-fish.js?regions=Indian%20Ocean%20Eastern",
+          adjustCenter: { standard: [-1, 1], rotate: [0, 0] },
+        },
+        {
+          filename: "topo_indian_ocean_western.json",
+          name: "IndianOceanWestern",
+          label: "Indian Ocean - Western",
+          mrgid: "8755",
+          color: "#4C7298",
+          link: "./results-fish.js?regions=Indian%20Ocean%20Western",
+          adjustCenter: { standard: [0, 0], rotate: [0, 0] },
+        },
+        {
+          filename: "topo_mediterranean_black_sea.json",
+          name: "MediterraneanBlackSea",
+          label: "Mediterranean and Black Seas",
+          mrgid: "8754",
+          color: "#4C7298",
+          link: "./results-fish.js?regions=Mediterranean%20And%20Black%20Sea",
+          adjustCenter: { standard: [0, 0], rotate: [0, 0] },
+        },
+        {
+          filename: "topo_pacific_antarctic.json",
+          name: "PacificAntarctic",
+          label: "Pacific Ocean - Antarctic",
+          mrgid: "8738",
+          color: "#4C7298",
+          link: "./results-fish.js?regions=Pacific%20Antarctic",
+          adjustCenter: { standard: [-3.5, 0], rotate: [0, 0] },
+        },
+        {
+          filename: "topo_pacific_eastern_central.json",
+          name: "PacificEasternCentral",
+          label: "Pacific Ocean - Eastern Central",
+          mrgid: "8743",
+          color: "#4C7298",
+          link: "./results-fish.js?regions=Pacific,%20Eastern%20Central",
+          adjustCenter: { standard: [0, 0], rotate: [0, 0] },
+        },
+        {
+          filename: "topo_pacific_northeast.json",
+          name: "PacificNortheast",
+          label: "Pacific Ocean - Northeast",
+          mrgid: "8744",
+          color: "#4C7298",
+          link: "./results-fish.js?regions=Pacific%20Northeast",
+          adjustCenter: { standard: [0, 0], rotate: [0, 0] },
+        },
+        {
+          filename: "topo_pacific_northwest.json",
+          name: "PacificNorthwest",
+          label: "Pacific Ocean - Northwest",
+          mrgid: "8745",
+          color: "#4C7298",
+          link: "./results-fish.js?regions=Pacific%20Northwest",
+          adjustCenter: { standard: [95, 1], rotate: [0, 0] },
+        },
+        {
+          filename: "topo_pacific_southeast.json",
+          name: "PacificSoutheast",
+          label: "Pacific Ocean - Southeast",
+          mrgid: "8742",
+          color: "#4C7298",
+          link: "./results-fish.js?regions=Pacific%20Southeast",
+          adjustCenter: { standard: [0, 0], rotate: [0, 0] },
+        },
+        {
+          filename: "topo_pacific_southwest.json",
+          name: "PacificSouthwest",
+          label: "Pacific Ocean - Southwest",
+          mrgid: "8739",
+          color: "#4C7298",
+          link: "./results-fish.js?regions=Pacific%20Southwest",
+          adjustCenter: { standard: [-90, 0], rotate: [0, 0] },
+        },
+        {
+          filename: "topo_pacific_western_central.json",
+          name: "PacificWesternCentral",
+          label: "Pacific Ocean - Western Central",
+          mrgid: "8746",
+          color: "#4C7298",
+          link: "./results-fish.js?regions=Pacific%20Western%20Central",
+          adjustCenter: { standard: [95, 0], rotate: [0, 0] },
+        },
+        {
+          filename: "topo_africa.json",
+          name: "Africa",
+          label: "Africa",
+          mrgid: "1923",
+          color: "#A1A1A1",
+          link: "./results-fish.js?regions=Africa%20-%20Inland%20Waters",
+          adjustCenter: { standard: [-3, -10], rotate: [0, 0] },
+        },
+        {
+          filename: "topo_antarctica.json",
+          name: "Antarctica",
+          label: "Antarctica",
+          mrgid: "1926",
+          color: "#A1A1A1",
+          link: "./results-fish.js?regions=Antarctica%20-%20Inland%20Waters",
+          adjustCenter: { standard: [-7, 14], rotate: [0, 0] },
+        },
+        {
+          filename: "topo_asia.json",
+          name: "Asia",
+          label: "Asia",
+          mrgid: "1921",
+          color: "#A1A1A1",
+          link: "./results-fish.js?regions=Asia%20-%20Inland%20Waters",
+          adjustCenter: { standard: [0, 0], rotate: [0, 0] },
+        },
+        {
+          filename: "topo_europe.json",
+          name: "Europe",
+          label: "Europe",
+          mrgid: "1920",
+          color: "#A1A1A1",
+          link: "./results-fish.js?regions=Europe%20-%20Inland%20Waters",
+          adjustCenter: { standard: [0, 0], rotate: [0, 0] },
+        },
+        {
+          filename: "topo_north_america.json",
+          name: "NorthAmerica",
+          label: "North America",
+          mrgid: "1924",
+          color: "#A1A1A1",
+          link: "./results-fish.js?regions=North%20America%20-%20Inland%20Waters",
+          adjustCenter: { standard: [-2, 5], rotate: [0, 0] },
+        },
+        {
+          filename: "topo_south_america.json",
+          name: "SouthAmerica",
+          label: "South America",
+          mrgid: "1925",
+          color: "#A1A1A1",
+          link: "./results-fish.js?regions=South%20America%20-%20Inland%20Waters",
+          adjustCenter: { standard: [0, 0], rotate: [0, 0] },
+        },
+        {
+          filename: "topo_australia.json",
+          name: "Australia",
+          label: "Australia and Oceana",
+          mrgid: "1922",
+          color: "#A1A1A1",
+          link: "./results-fish.js?regions=Oceania%20-%20Inland%20Waters",
+          adjustCenter: { standard: [-9, -12], rotate: [0, 0] },
+        },
+      ];
+
+      // Convert to {handles:true,rotate:false,scale:true} when ready to test scaled coloration
+      window.onload = function () {
+        buildMap("mapContent", data, { handles: true, rotate: false });
+      };
+    </script>
+  </body>
+</html>
